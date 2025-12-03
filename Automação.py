@@ -11,7 +11,7 @@ class ConfigBancoDados:
     def __init__(self):
         self.host = "localhost"
         self.user = "root"
-        self.password = "3974Jo17@"  # Sua senha do MySQL
+        self.password = ""  # Sua senha do MySQL
         self.database = "2t_oficina"
         self.port = 3306
 
@@ -97,49 +97,6 @@ class GerenciadorBancoDados:
         except mysql.connector.Error as e:
             print(f"Erro ao consultar banco de dados: {e}")
             return []
-    
-    def adicionar_coluna_lembrete(self):
-        """
-        Adiciona coluna 'lembrete_enviado' na tabela agendamento se não existir
-        Execute este método apenas uma vez para preparar o banco
-        """
-        try:
-            conn = self._conectar()
-            cursor = conn.cursor()
-            
-            cursor.execute("""
-                ALTER TABLE agendamento 
-                ADD COLUMN IF NOT EXISTS lembrete_enviado TINYINT DEFAULT 0
-            """)
-            
-            conn.commit()
-            cursor.close()
-            conn.close()
-            
-            print("✓ Coluna 'lembrete_enviado' verificada/criada com sucesso")
-            
-        except mysql.connector.Error as e:
-            print(f"Aviso ao adicionar coluna: {e}")
-    
-    def marcar_lembrete_enviado(self, id_agendamento: int):
-        """Marca um agendamento como já tendo recebido lembrete"""
-        try:
-            conn = self._conectar()
-            cursor = conn.cursor()
-            
-            cursor.execute("""
-                UPDATE agendamento 
-                SET lembrete_enviado = 1 
-                WHERE id = %s
-            """, (id_agendamento,))
-            
-            conn.commit()
-            cursor.close()
-            conn.close()
-            
-        except mysql.connector.Error as e:
-            print(f"Erro ao marcar lembrete como enviado: {e}")
-
 
 class EnviadorEmail:
     """Responsável por enviar emails de lembrete"""
