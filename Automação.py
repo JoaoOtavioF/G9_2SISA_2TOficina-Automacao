@@ -11,7 +11,7 @@ class ConfigBancoDados:
     def __init__(self):
         self.host = "localhost"
         self.user = "root"
-        self.password = ""  # Sua senha do MySQL
+        self.password = "1201fariawm"  # Sua senha do MySQL
         self.database = "2t_oficina"
         self.port = 3306
 
@@ -97,6 +97,36 @@ class GerenciadorBancoDados:
         except mysql.connector.Error as e:
             print(f"Erro ao consultar banco de dados: {e}")
             return []
+    
+    def marcar_lembrete_enviado(self, id_agendamento: int) -> bool:
+        """
+        Marca que o lembrete foi enviado para o agendamento
+        Pode ser usado para evitar envios duplicados
+        """
+        try:
+            conn = self._conectar()
+            cursor = conn.cursor()
+            
+            # Registra a data/hora do envio do lembrete
+            # Você pode criar uma tabela específica ou adicionar um campo no agendamento
+            # Por enquanto, vamos apenas confirmar o registro
+            query = """
+            UPDATE agendamento 
+            SET observacao = CONCAT(COALESCE(observacao, ''), '\nLembrete enviado em: ', NOW())
+            WHERE id = %s
+            """
+            
+            cursor.execute(query, (id_agendamento,))
+            conn.commit()
+            
+            cursor.close()
+            conn.close()
+            
+            return True
+            
+        except mysql.connector.Error as e:
+            print(f"Aviso: Não foi possível marcar lembrete enviado: {e}")
+            return False
 
 class EnviadorEmail:
     """Responsável por enviar emails de lembrete"""
